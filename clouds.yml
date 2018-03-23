@@ -1,0 +1,11 @@
+clouds:
+  mycloud:
+    region_name: RegionOne
+    auth:
+      username: admin
+      password: 50937613b1734615
+      project_name: admin
+      auth_url: http://172.22.26.201:5000/v3
+      project_domain_name: Default
+      user_domain_name: Default
+    validate_certs: no

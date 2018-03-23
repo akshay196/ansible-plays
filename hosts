@@ -1,0 +1,2 @@
+[local]
+localhost ansible_connection=local ansible_python_interpreter="/home/akshay/learn/os_modules/virt/bin/python"

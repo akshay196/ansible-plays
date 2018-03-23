@@ -1,0 +1,26 @@
+---
+- name: Check user on OpenStack environment
+  hosts: local
+  connection: local
+  gather_facts: false
+  environment:
+    OS_CLIENT_CONFIG_FILE: "{{ playbook_dir }}/clouds.yml"
+    OS_IDENTITY_API_VERSION: 3
+
+  tasks:
+    - name: Authenticate to specified OpenStack provider
+      os_auth:
+        cloud: mycloud
+
+    - name: Show service catalog
+      debug:
+        var: service_catalog
+
+    - os_user:
+        cloud: mycloud
+        state: present
+        name: demouser
+        password: secret
+        email: demo@example.com
+        domain: Default
+        default_project: demo
