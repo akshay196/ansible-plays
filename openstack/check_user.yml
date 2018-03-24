@@ -1,5 +1,5 @@
 ---
-- name: Check user on OpenStack environment
+- name: Check user permissions on OpenStack environment
   hosts: local
   connection: local
   gather_facts: false
@@ -12,18 +12,24 @@
       os_auth:
         cloud: mycloud
 
-    - os_user_role:
-        auth:
-          auth_url: http://172.22.26.201:5000/v3
-          username: admin
-          password: 50937613b1734615
-          project_name: admin
-          project_domain_name: Default
-          user_domain_name: Default
-        user: demouser
-        role: admin
-        project: demo
-      register: user_state
+    - name: Grant admin role to user and grab changes
+      block:
+        - os_user_role:
+            auth:
+              auth_url: http://172.22.26.201:5000/v3
+              username: admin
+              password: 50937613b1734615
+              project_name: admin
+              project_domain_name: Default
+              user_domain_name: Default
+            user: demouser
+            role: admin
+            project: demo
+          register: user_state
+      rescue:
+        - name: user don't exist
+          set_fact:
+            message: "User don't exist"
 
     - name: If user role is changed to admin
       os_user_role:
@@ -40,15 +46,17 @@
         project: demo
       when: user_state|changed
 
-    - set_fact:
-        message: "demouser has not permission to lauch instance"
+    - name: Set message if user is not admin
+      set_fact:
+        message: "demouser don't have privileges for OpenStack provider"
       when: user_state|changed
 
-    - set_fact:
-        message: "demouser has permission to launch instance"
+    - name: Set message if user is admin
+      set_fact:
+        message: "demouser have privileges for OpenStack provider"
       when: message is undefined
 
-    - name: Send mail if user has permission
+    - name: Send mail
       mail:
         host: smtp.mailtrap.io
         port: 2525
@@ -57,8 +65,8 @@
         to: User <user@gmail.com>
         subject: Request-report
         body: "{{ message }}"
+      when: message is defined
 
     - name : Debug
       debug:
         var: user_state
-
