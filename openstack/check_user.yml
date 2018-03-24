@@ -23,4 +23,23 @@
         user: demouser
         role: admin
         project: demo
+      register: user_state
+
+    - os_user_role:
+        auth:
+          auth_url: http://172.22.26.201:5000/v3
+          username: admin
+          password: 50937613b1734615
+          project_name: admin
+          project_domain_name: Default
+          user_domain_name: Default
+        user: demouser
+        state: absent
+        role: admin
+        project: demo
+      when: user_state|changed
+
+    - name : Debug
+      debug:
+        var: user_state
 
