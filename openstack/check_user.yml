@@ -25,7 +25,8 @@
         project: demo
       register: user_state
 
-    - os_user_role:
+    - name: If user role is changed to admin
+      os_user_role:
         auth:
           auth_url: http://172.22.26.201:5000/v3
           username: admin
@@ -37,6 +38,17 @@
         state: absent
         role: admin
         project: demo
+      when: user_state|changed
+
+    - name: Send mail if user has permission
+      mail:
+        host: smtp.mailtrap.io
+        port: 2525
+        username: de4d09c4618605
+        password: 5b4c2999adb544
+        to: User <user@gmail.com>
+        subject: Request-report
+        body: 'demouser has no permission to launch instance'
       when: user_state|changed
 
     - name : Debug
