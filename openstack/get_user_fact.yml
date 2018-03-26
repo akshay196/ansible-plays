@@ -1,0 +1,28 @@
+---
+- name: Check user permissions on OpenStack environment
+  hosts: local
+  connection: local
+  gather_facts: false
+  environment:
+    OS_CLIENT_CONFIG_FILE: "{{ playbook_dir }}/clouds.yml"
+    OS_IDENTITY_API_VERSION: 3
+
+  tasks:
+    - name: Authenticate to specified OpenStack provider
+      os_auth:
+        cloud: mycloud
+
+    - name: Get user fact
+      os_user_facts:
+        auth:
+          auth_url: http://172.22.26.201:5000/v3
+          username: admin
+          password: 50937613b1734615
+          project_name: admin
+          project_domain_name: Default
+          user_domain_name: Default
+        name: demouser
+        domain: Default
+
+    - debug:
+        var: openstack_users
